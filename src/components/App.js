@@ -72,6 +72,47 @@ class App extends Component {
     }
   }
 
+  buyTokens = (etherAmount) => {
+    this.setState({ loading: true })
+    this.state.ethSwap
+      .methods
+      .buyTokens()
+      .send({ value: etherAmount, from: this.state.account })
+      .on('transactionHash', (hash) => {
+        this.setState({ loading: false })
+      })
+  }
+
+
+  sellToken = (tokenAmount) => {
+    this.setState({ loading: true })
+    this.state.token.methods.approve(this.state.ethSwap.address, tokenAmount).send({ from: this.state.account }).on('transactionHash', (hash) => {
+      this.state.ethSwap.methods.sellTokens(tokenAmount).send({ from: this.state.account }).on('transactionHash', (hash) => {
+        this.setState({ loading: false })
+      })
+    })
+  }
+
+  // sellToken = (tokenAmount) => {
+  //   this.setState({ loading: true })
+  //   this.state.token
+  //     .methods
+  //     .approve(this.state.ethSwap.address, tokenAmount)
+  //     .send({ from: this.state.account })
+  //     .on('transactionHash', (hash) => {
+  //       this.setState({ loading: false })
+  //       this.state.ethSwap
+  //         .methods
+  //         .sellTokens(tokenAmount)
+  //         .send({ from: this.state.account })
+  //         .on('transactionHash', (hash) => {
+  //           this.setState({ loading: false })
+  //         })
+  //     })
+
+
+  // }
+
   render() {
 
     let content
@@ -81,14 +122,15 @@ class App extends Component {
       content = <Main
         ethBalance={this.state.ethBalance}
         tokenBalance={this.state.tokenBalance}
-        buyTokens={this.buyTokens} />
+        buyTokens={this.buyTokens}
+        sellTokens={this.sellToken}
+      />
     }
 
     return (
       <div>
         {content}
       </div>
-
     );
   }
 }
